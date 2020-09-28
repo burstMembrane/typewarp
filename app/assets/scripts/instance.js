@@ -18,24 +18,30 @@ export default (sketch) => {
     spacingSlider,
     bgColourPicker,
     fillCheckbox,
-    simplifySlider,
+    strokeWeightSlider,
     rainbow,
     fpsCheckbox,
     boundCheckbox,
+    crosshairCheckbox,
     centerButton,
     savePresetButton,
     loadPresetButton,
+    fillTextStrokeCheckbox,
     sinX,
     sinY,
     xAnim,
     yAnim,
     fillColor,
     lineColor;
+  let strokeWeight = 1;
+  let controlPanel = document.querySelector(".controlpanel");
+  let controlpanelWidth = controlPanel.clientWidth;
+  let showCrosshair = false;
 
-  let fontSize = 300;
   let textArray = [];
   let w = window.innerWidth;
   let h = window.innerHeight;
+  let fontSize = w < 600 ? w / 2.2 : w / 4;
   let posX = 0.01;
   let posY = 0;
   let innerText = "HEAT";
@@ -53,9 +59,10 @@ export default (sketch) => {
   let textY = h / 2;
   let textBoundary;
   let arraySampleFactor = 1;
-  let showFps = true;
+  let showFps = false;
   let showBoundary = false;
   let dragging = false;
+  let fillTextStroke = false;
   let presets = [];
 
   // EVENT LISTENERS
@@ -77,7 +84,7 @@ export default (sketch) => {
   };
   sketch.windowResized = () => {
     sketch.resizeCanvas(sketch.windowWidth, sketch.windowHeight);
-    w = sketch.width;
+    w = sketch.width - controlpanelWidth;
     h = sketch.height;
     textX = w / 2;
     textY = h / 2;
@@ -139,7 +146,7 @@ export default (sketch) => {
 
     textArray = font.textToPoints(innerText, textX, textY, fontSize, {
       sampleFactor: sampleFactorSlider.value(),
-      simplifyThreshold: simplifySlider.value(),
+      simplifyThreshold: 0,
     });
   }
 
@@ -147,7 +154,7 @@ export default (sketch) => {
     textBoundary = font.textBounds(innerText, textX, textY, fontSize);
     textArray = font.textToPoints(innerText, textX, textY, fontSize, {
       sampleFactor: sampleFactorSlider.value(),
-      simplifyThreshold: simplifySlider.value(),
+      simplifyThreshold: 0,
     });
   }
 
@@ -245,32 +252,46 @@ export default (sketch) => {
     sinYSlider = sketch.createSlider(0, h, sinYRatio, 0.1);
     xInitSlider = sketch.createSlider(-w, w, xInit, 0.1);
     yInitSlider = sketch.createSlider(-h, h, yInit, 0.1);
-    simplifySlider = sketch.createSlider(0, 0.05, simplify, 0.01);
-    simplifySlider.changed(changeText);
+    strokeWeightSlider = sketch.createSlider(1, 15, strokeWeight, 1);
+
     spacingSlider = sketch.createSlider(0, 2, spacing, 0.05);
     sampleFactorSlider = sketch.createSlider(0.01, 1.5, arraySampleFactor, 0.1);
     sampleFactorSlider.changed(changeText);
     colorPicker = sketch.createColorPicker("#ff0048");
     textColorPicker = sketch.createColorPicker("#fff");
     bgColourPicker = sketch.createColorPicker("#1f1f1f");
-    fillCheckbox = sketch.createCheckbox("Fill Text", false);
-    rainbow = sketch.createCheckbox("Rainbow Mode", false);
-    rainbow.changed(handleRainbow);
+
+    rainbow = sketch.createCheckbox("Rainbow Mode!", rainbowMode);
+    rainbow.changed(() => (rainbowMode = !rainbowMode));
     rainbow.parent(controlPanel);
-    fillCheckbox.changed(handleCheck);
+
+    fillCheckbox = sketch.createCheckbox("Fill Text", fillText);
+    fillCheckbox.changed(() => (fillText = !fillText));
     fillCheckbox.parent(controlPanel);
 
-    fpsCheckbox = sketch.createCheckbox("Show FPS", false);
-    fpsCheckbox.changed(handleFPS);
+    fpsCheckbox = sketch.createCheckbox("FPS", showFps);
+    fpsCheckbox.changed(() => (showFps = !showFps));
     fpsCheckbox.parent(controlPanel);
 
-    boundCheckbox = sketch.createCheckbox("Show Bounding Box", false);
-    boundCheckbox.changed(handleBoundary);
-    fontInput = sketch.createFileInput(handleFile);
-    fontInput.parent(controlPanel);
+    crosshairCheckbox = sketch.createCheckbox("Crosshair", showCrosshair);
+    crosshairCheckbox.changed(() => (showCrosshair = !showCrosshair));
+    crosshairCheckbox.parent(controlPanel);
+
+    fillTextStrokeCheckbox = sketch.createCheckbox(
+      "Fill Text Stroke",
+      fillTextStroke
+    );
+    fillTextStrokeCheckbox.changed(() => (fillTextStroke = !fillTextStroke));
+    fillTextStrokeCheckbox.parent(controlPanel);
+
+    boundCheckbox = sketch.createCheckbox("Bounding Box", showBoundary);
+    boundCheckbox.changed(() => (showBoundary = !showBoundary));
+
     textInput = sketch.createInput(innerText);
     textInput.input(handleInput);
     textInput.parent(controlPanel);
+    fontInput = sketch.createFileInput(handleFile);
+    fontInput.parent(controlPanel);
 
     saveButton = sketch.createButton("Save Frame");
     saveButton.mousePressed(() => {
@@ -295,7 +316,6 @@ export default (sketch) => {
     loadPresetButton.parent(controlPanel);
 
     const labels = [
-      {label: "Upload Font (.otf, .ttf)", element: fontInput},
       {
         label: "Animation Speed X",
         element: speedXSlider,
@@ -305,11 +325,11 @@ export default (sketch) => {
         element: speedYSlider,
       },
       {
-        label: "Sine Range X",
+        label: "Animation Range X",
         element: sinXSlider,
       },
       {
-        label: "Sine Range Y",
+        label: "Animation Range Y",
         element: sinYSlider,
       },
       {
@@ -325,8 +345,8 @@ export default (sketch) => {
         element: spacingSlider,
       },
       {
-        label: "Simplify",
-        element: simplifySlider,
+        label: "Stroke Weight",
+        element: strokeWeightSlider,
       },
       {
         label: "Sample Factor",
@@ -348,6 +368,7 @@ export default (sketch) => {
         label: "Background Colour",
         element: bgColourPicker,
       },
+      {label: "Upload OpenType Font ", element: fontInput},
       {
         label: "",
         element: rainbow,
@@ -355,6 +376,14 @@ export default (sketch) => {
       {
         label: "",
         element: fillCheckbox,
+      },
+      {
+        label: "",
+        element: fillTextStrokeCheckbox,
+      },
+      {
+        label: "",
+        element: crosshairCheckbox,
       },
       {
         label: "",
@@ -371,16 +400,20 @@ export default (sketch) => {
   // MAKE ANIMATION FROM VERTICES
   function makeVertexAnimation() {
     textArray.map(function (val) {
+      sketch.push();
       val.x = Math.floor(val.x);
       val.y = Math.floor(val.y);
       sinX = Math.sin(posX);
       sinY = Math.sin(posY);
+      sketch.strokeCap(sketch.ROUND);
+      sketch.strokeWeight(strokeWeight);
       xAnim = (xInit + val.x + sinX * sinXRatio) * spacing;
       yAnim = (yInit + val.y + sinY * sinYRatio) * spacing;
       sketch.beginShape();
       sketch.vertex(val.x, val.y);
       sketch.vertex(xAnim, yAnim);
       sketch.endShape(sketch.CLOSE);
+      sketch.pop();
     });
   }
 
@@ -409,6 +442,7 @@ export default (sketch) => {
       xAnim = (xInit + textArray[len].x + sinX * sinXRatio) * spacing;
       yAnim = (yInit + textArray[len].y + sinY * sinYRatio) * spacing;
       sketch.beginShape();
+
       sketch.vertex(textArray[len].x, textArray[len].y);
       sketch.vertex(xAnim, yAnim);
       sketch.endShape(sketch.CLOSE);
@@ -424,7 +458,7 @@ export default (sketch) => {
     sketch.colorMode(sketch.RGB);
     sketch.fill(255, 255, 255);
     sketch.textSize(20);
-    sketch.text("FPS: " + fps, sketch.width - 80, 20);
+    sketch.text("FPS: " + fps, sketch.width - 72, 32);
     sketch.pop();
   }
 
@@ -441,10 +475,24 @@ export default (sketch) => {
     );
     sketch.pop();
   }
+
+  function drawCrossHair() {
+    sketch.push();
+    sketch.noFill();
+    sketch.stroke(255);
+    sketch.strokeWeight(3);
+    sketch.translate(sketch.width / 2, sketch.height / 2);
+    sketch.line(-10, 0, 10, 0);
+    sketch.line(0, -10, 0, 10);
+
+    sketch.pop();
+  }
   function showFillText() {
     sketch.push();
     sketch.textFont(font);
-    sketch.noStroke();
+    sketch.strokeWeight(strokeWeight);
+    fillTextStroke ? sketch.stroke(fillColor) : sketch.noStroke();
+
     sketch.fill(fillColor);
     sketch.text(innerText, textX, textY);
     sketch.pop();
@@ -452,7 +500,7 @@ export default (sketch) => {
 
   // DRAW FUNCTIONS
   function updateValues() {
-    simplify = simplifySlider.value();
+    strokeWeight = strokeWeightSlider.value();
     fontSize = textSizeSlider.value();
     sketch.textSize(fontSize);
     sinXRatio = sinXSlider.value();
@@ -487,7 +535,7 @@ export default (sketch) => {
 
   sketch.setup = () => {
     console.log(font);
-    sketch.createCanvas(w - 200, h);
+    sketch.createCanvas(w, h);
 
     sketch.pixelDensity(1);
     textX = sketch.width / 2;
@@ -504,10 +552,12 @@ export default (sketch) => {
     showBoundary || dragging ? showBoundingBox() : null;
     sketch.noStroke();
     !rainbowMode ? sketch.stroke(lineColor) : runRainbowMode();
-    //makeVertexWhileLoop();
+    // makeVertexWhileLoop();
     //makeRotateAnimation();
 
     makeVertexAnimation();
     fillText ? showFillText() : null;
+
+    showCrosshair ? drawCrossHair() : null;
   };
 };

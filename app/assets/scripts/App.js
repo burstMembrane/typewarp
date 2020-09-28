@@ -10,3 +10,18 @@ new p5(s);
 // if (module.hot) {
 //   module.hot.accept();
 // }
+
+const cPanel = document.querySelector(".controlpanel");
+const handle = document.querySelector(".handle");
+
+cPanel.classList.add("hide");
+
+setTimeout(() => {
+  cPanel.classList.remove("hide");
+
+  cPanel.classList.remove("collapse");
+}, 500);
+
+handle.addEventListener("click", () => {
+  cPanel.classList.toggle("collapse");
+});

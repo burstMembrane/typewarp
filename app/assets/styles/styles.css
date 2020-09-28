@@ -17,3 +17,4 @@
 /* relative module imports from module/_module.css */
 
 @import "modules/_controlpanel";
+@import "modules/_scrollbar";
