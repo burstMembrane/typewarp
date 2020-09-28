@@ -1,8 +1,10 @@
-function handleCheck() {
+let rainbowMode = false;
+
+export function handleCheck() {
   fillText = this.checked();
 }
 
-function handleFile(file) {
+export function handleFile(file) {
   console.log(font);
 
   const p5Font = new p5.Font();
@@ -15,23 +17,21 @@ function handleFile(file) {
       // Use your font here.
     }
   });
-
   changeText();
 }
 
-export default handleRainbow = () => {
+export function handleRainbow() {
   rainbowMode = this.checked();
-};
-
-function handleBoundary() {
+}
+export function handleBoundary() {
   showBoundary = this.checked();
 }
 
-function handleFPS() {
+export function handleFPS() {
   showFps = this.checked();
 }
 
-function handleInput() {
+export function handleInput() {
   innerText = this.value();
   changeText();
 }

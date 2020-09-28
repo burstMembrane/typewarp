@@ -4,7 +4,7 @@ import "../styles/styles.css";
 import p5 from "p5";
 
 import s from "./instance";
-let myp5 = new p5(s);
+new p5(s);
 
 // ! allow hot reloading of the files in project
 if (module.hot) {

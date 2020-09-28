@@ -1,44 +1,40 @@
 import otfFile from "./font.otf";
-import throttle from "lodash/throttle";
 import opentype from "opentype.js";
 import p5 from "p5";
 export default (sketch) => {
   let font,
-    sinXSlider,
-    sinYSlider,
-    textSizeSlider,
+    sampleFactorSlider,
     speedXSlider,
     speedYSlider,
+    colorPicker,
+    textColorPicker,
+    bgColor,
+    textSizeSlider,
+    sinXSlider,
+    sinYSlider,
     xInitSlider,
     yInitSlider,
-    simplifySlider,
     spacingSlider,
-    sampleFactorSlider,
-    textColorPicker,
     bgColourPicker,
     fillCheckbox,
+    simplifySlider,
     rainbow,
-    colorPicker,
     fpsCheckbox,
+    boundCheckbox,
+    centerButton,
     savePresetButton,
     loadPresetButton,
-    centerButton,
     sinX,
     sinY,
-    rainbowFill,
-    lineColor,
-    bgColor,
-    boundCheckbox,
-    fillColor,
     xAnim,
-    yAnim;
+    yAnim,
+    fillColor,
+    lineColor;
 
   let fontSize = 300;
   let textArray = [];
   let w = window.innerWidth;
   let h = window.innerHeight;
-  let x = 0;
-  let y = 0;
   let posX = 0.01;
   let posY = 0;
   let innerText = "HEAT";
@@ -55,16 +51,16 @@ export default (sketch) => {
   let changeButton;
   let textX = w / 2;
   let textY = h / 2;
-  let lastX = 0;
   let textBoundary;
   let arraySampleFactor = 1;
-  let showFps = true;
+  let showFps = false;
   let showBoundary = false;
-
   let presets = [];
 
+  // EVENT LISTENERS
+
   sketch.mouseDragged = () => {
-    const { mouseX, mouseY } = sketch;
+    const {mouseX, mouseY} = sketch;
     if (mouseX > 200 && mouseX < w && mouseY > 0 && mouseY < h) {
       textX = mouseX;
       textY = mouseY;
@@ -72,13 +68,23 @@ export default (sketch) => {
     }
   };
 
+  sketch.windowResized = () => {
+    sketch.resizeCanvas(sketch.windowWidth, sketch.windowHeight);
+    w = sketch.windowWidth;
+    h = sketch.windowHeight;
+    textX = w / 2;
+    textY = h / 2;
+    textSetup();
+  };
+
+  // INPUT HANDLERS
+
   function handleCheck() {
     fillText = this.checked();
   }
 
   function handleFile(file) {
     console.log(font);
-
     const p5Font = new p5.Font();
     console.log(p5Font);
     opentype.load(file.data, function (err, newFont) {
@@ -89,42 +95,30 @@ export default (sketch) => {
         // Use your font here.
       }
     });
-
     changeText();
   }
-
   function handleRainbow() {
     rainbowMode = this.checked();
   }
   function handleBoundary() {
     showBoundary = this.checked();
   }
-
   function handleFPS() {
     showFps = this.checked();
   }
-
   function handleInput() {
     innerText = this.value();
     changeText();
   }
 
-  function logTextPos() {
-    if (lastX !== textX) {
-      console.log(`textX: ${textX}, textY:${textY}`);
-      lastX = textX;
-    }
-  }
-
+  // TEXT SETUP
   function textSetup() {
     sketch.textStyle(sketch.BOLD);
-
     sketch.textSize(fontSize);
     sketch.fill(255);
     textBoundary = font.textBounds(innerText, textX, textY, fontSize);
     textX = textX - textBoundary.w / 2;
     textY = textY;
-
     textBoundary = font.textBounds(innerText, textX, textY, fontSize);
     textBoundary.w += 19;
     textArray = font.textToPoints(innerText, textX, textY, fontSize, {
@@ -132,6 +126,16 @@ export default (sketch) => {
       simplifyThreshold: 0,
     });
   }
+
+  function changeText() {
+    textBoundary = font.textBounds(innerText, textX, textY, fontSize);
+    textArray = font.textToPoints(innerText, textX, textY, fontSize, {
+      sampleFactor: sampleFactorSlider.value(),
+      simplifyThreshold: 0,
+    });
+  }
+
+  // PRESETS
 
   function savePreset() {
     presets.push({
@@ -155,54 +159,8 @@ export default (sketch) => {
     });
   }
 
-  function changeText() {
-    textBoundary = font.textBounds(innerText, textX, textY, fontSize);
-
-    textArray = font.textToPoints(innerText, textX, textY, fontSize, {
-      sampleFactor: sampleFactorSlider.value(),
-      simplifyThreshold: 0,
-    });
-  }
-
-  function addClasses() {
-    const inputs = document.querySelectorAll("input");
-    inputs.forEach(function (input) {
-      input.classList.add(".p5input");
-      document.querySelector(".controlpanel").appendChild(input);
-    });
-    const labels = document.querySelectorAll("label");
-    labels.forEach(function (label) {
-      label.classList.add(".p5label");
-      document.querySelector(".controlpanel").appendChild(label);
-    });
-  }
-
-  function updateLabels(labels) {
-    labels.forEach(function (label) {
-      let elementLabel = document.createElement("label");
-      label.element.name = label.label;
-      const id = label.element.name;
-      label.element.elt.id = id;
-
-      //elementLabel.innerText = label.label + ": " + label.element.value();
-      elementLabel.innerText = label.label;
-
-      elementLabel.setAttribute("for", id);
-      document.querySelector(".controlpanel").appendChild(elementLabel);
-      label.element.parent(sketch.select(".controlpanel"));
-    });
-  }
-  sketch.windowResized = () => {
-    sketch.resizeCanvas(sketch.windowWidth, sketch.windowHeight);
-    w = sketch.windowWidth;
-    h = sketch.windowHeight;
-    textX = w / 2;
-    textY = h / 2;
-    textSetup();
-  };
   function loadPreset() {
     console.log(presets[presets.length - 1]);
-
     let {
       presetArray,
       fontSize,
@@ -222,7 +180,6 @@ export default (sketch) => {
       storedY,
       fillText,
     } = presets[presets.length - 1];
-
     textArray = presetArray;
     textSizeSlider.value(fontSize);
     speedXSlider.value(speedX);
@@ -244,6 +201,24 @@ export default (sketch) => {
     innerText = storedText;
   }
 
+  // MAKE LABELS FOR UI
+  function updateLabels(labels) {
+    labels.forEach(function (label) {
+      let elementLabel = document.createElement("label");
+      label.element.name = label.label;
+      const id = label.element.name;
+      label.element.elt.id = id;
+
+      //elementLabel.innerText = label.label + ": " + label.element.value();
+      elementLabel.innerText = label.label;
+
+      elementLabel.setAttribute("for", id);
+      document.querySelector(".controlpanel").appendChild(elementLabel);
+      label.element.parent(sketch.select(".controlpanel"));
+    });
+  }
+
+  // SETUP UI
   function setupControls() {
     const controlPanel = sketch.select(".controlpanel");
     textSizeSlider = sketch.createSlider(12, 512, fontSize, 12);
@@ -357,7 +332,6 @@ export default (sketch) => {
         label: "",
         element: rainbow,
       },
-
       {
         label: "",
         element: fillCheckbox,
@@ -371,33 +345,10 @@ export default (sketch) => {
         element: boundCheckbox,
       },
     ];
-
     updateLabels(labels);
   }
-  let lastval = 0;
 
-  function logifChanged(val) {
-    if (val !== lastval) {
-      console.log(val);
-      lasval = val;
-    }
-  }
-
-  function makeLineAnimation() {
-    for (let i = 0; i < textArray.length; i++) {
-      let x = textArray[i].x;
-      let y = textArray[i].y;
-      sinX = sketch.sin(posX);
-      sinX == 0 ? console.log(sinX) : null;
-      sinY = sketch.sin(posY);
-      xAnim = (xInit + x + sinX * sinXRatio) * spacing;
-      yAnim = (yInit + y + sinY * sinYRatio) * spacing;
-      sketch.push();
-      sketch.line(x, y, xAnim, yAnim);
-      sketch.pop();
-    }
-  }
-
+  // MAKE ANIMATION FROM VERTICES
   function makeVertexAnimation() {
     textArray.forEach(function (val) {
       let x = val.x;
@@ -405,18 +356,17 @@ export default (sketch) => {
       sinX = sketch.sin(posX);
       sinX == 0 ? console.log(sinX) : null;
       sinY = sketch.sin(posY);
-
       xAnim = (xInit + x + sinX * sinXRatio) * spacing;
       yAnim = (yInit + y + sinY * sinYRatio) * spacing;
-      sketch.beginShape();
+      sketch.beginShape(sketch.LINES);
       sketch.fill(255);
       sketch.vertex(x, y);
       sketch.vertex(xAnim, yAnim);
-
       sketch.endShape(sketch.CLOSE);
     });
   }
 
+  // SHOW/HIDE VISUAL ELEMENTS
   function showFPS() {
     sketch.push();
     sketch.textFont(font);
@@ -425,7 +375,7 @@ export default (sketch) => {
     sketch.colorMode(sketch.RGB);
     sketch.fill(255, 255, 255);
     sketch.textSize(20);
-    sketch.text("FPS: " + fps, w - 80, 20);
+    sketch.text("FPS: " + fps, sketch.width - 80, 20);
     sketch.pop();
   }
 
@@ -446,30 +396,13 @@ export default (sketch) => {
     sketch.push();
     sketch.textFont(font);
     sketch.noStroke();
-
-    sketch.fill(!rainbowMode ? fillColor : rainbowFill);
+    sketch.fill(fillColor);
     sketch.text(innerText, textX, textY);
     sketch.pop();
   }
-  sketch.preload = () => {
-    //   load in the font
-    setupControls();
-    font = sketch.loadFont(otfFile);
-  };
 
-  sketch.setup = () => {
-    sketch.createCanvas(w - 150, h);
-    textX = w / 2;
-    textY = h / 2;
-    textSetup();
-
-    setTimeout(savePreset, 100);
-  };
-
-  sketch.draw = () => {
-    //sketch.frameCount % 20 == 0 ? logTextPos() : null;
-    //frameCount % 20 == 0  ? console.log(sinX) : null;
-
+  // DRAW FUNCTIONS
+  function updateValues() {
     simplify = simplifySlider.value();
     fontSize = textSizeSlider.value();
     sketch.textSize(fontSize);
@@ -485,24 +418,40 @@ export default (sketch) => {
     lineColor = colorPicker.color();
     spacing = spacingSlider.value();
     fillColor = textColorPicker.color();
+  }
 
+  function runRainbowMode() {
+    let hue = sketch.frameCount % 100;
+
+    let rainbowFill = sketch.color(hue, 100, 100);
+    console.log(sketch.hex(rainbowFill));
+    colorPicker.value(sketch.hex(rainbowFill));
+    textColorPicker.value(sketch.hex(rainbowFill));
+    // sketch.stroke(sketch.color(hue, 50, 100));
+  }
+
+  // p5 functions
+  sketch.preload = () => {
+    setupControls();
+    font = sketch.loadFont(otfFile);
+  };
+
+  sketch.setup = () => {
+    sketch.createCanvas(w - 200, h);
+    sketch.pixelDensity(1);
+    textX = w / 2;
+    textY = h / 2;
+    textSetup();
+    setTimeout(savePreset, 100);
+  };
+
+  sketch.draw = () => {
+    updateValues();
     sketch.background(bgColor);
     showFps ? showFPS() : null;
     showBoundary ? showBoundingBox() : null;
     sketch.noStroke();
-
-    if (rainbowMode) {
-      let hue = sketch.frameCount % 100;
-      sketch.colorMode(sketch.HSB, 100);
-      let rainbowFill = sketch.color(hue, 100, 100);
-      sketch.fill(rainbowFill);
-      sketch.stroke(sketch.color(hue, 50, 100));
-    }
-
-    !rainbowMode ? sketch.stroke(lineColor) : null;
-
-    //makeLineAnimation();
-
+    !rainbowMode ? sketch.stroke(lineColor) : runRainbowMode();
     makeVertexAnimation();
     fillText ? showFillText() : null;
   };

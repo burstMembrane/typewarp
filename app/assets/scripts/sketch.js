@@ -441,15 +441,17 @@ function draw() {
 
   if (rainbowMode) {
     let hue = frameCount % 100;
-    let rainbowFill = sketch.color(hue, 100, 100);
+    let rainbowFill = color(hue, 100, 100);
     fill(rainbowFill);
     stroke(color(hue, 50, 100));
     colorMode(HSB, 100);
   }
 
   !rainbowMode ? stroke(lineColor) : null;
-  makeLineAnimation();
-  //makeVertexAnimation();
+
+  //makeLineAnimation();
+
+  makeVertexAnimation();
   push();
   fill(fillColor);
   textSize(fontSize);
