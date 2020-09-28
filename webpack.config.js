@@ -47,8 +47,12 @@ let config = {
     rules: [
       cssConfig,
       {
-        test: /\.(png|svg|jpg|gif|otf)$/,
+        test: /\.(png|svg|jpg|gif)$/,
         use: ["file-loader"],
+      },
+      {
+        test: /\.(ttf|otf)$/,
+        use: ["file-loader?name=fonts/[name].[ext]"],
       },
     ],
   },

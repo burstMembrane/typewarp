@@ -1,3 +1,7 @@
 {
-  "prettier.bracketSpacing": false
+  "prettier.bracketSpacing": false,
+  "files.associations": {
+    "*.js": "javascript",
+    "*.css": "scss"
+  }
 }
