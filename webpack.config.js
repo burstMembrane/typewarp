@@ -1,6 +1,6 @@
 const currentTask = process.env.npm_lifecycle_event;
 const path = require("path");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const fse = require("fs-extra");
@@ -23,7 +23,7 @@ let pages = fse
 class RunAfterCompile {
   apply(compiler) {
     compiler.hooks.done.tap("Copy Images", () => {
-      fse.copySync("./app/assets/images", "./docs/assets/images");
+      fse.copySync("./app/assets/images", "./dist/assets/images");
     });
   }
 }
@@ -102,7 +102,7 @@ if (currentTask == "build") {
     new MiniCssExtractPlugin({
       filename: "styles.[chunkhash].css",
     }),
-    new RunAfterCompile(),
+    //new RunAfterCompile(),
   ];
   cssConfig.use.unshift(MiniCssExtractPlugin.loader);
 }
