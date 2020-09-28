@@ -1,7 +1,6 @@
 import otfFile from "./font.otf";
 import opentype from "opentype.js";
 import p5 from "p5";
-
 export default (sketch) => {
   let font,
     sampleFactorSlider,
