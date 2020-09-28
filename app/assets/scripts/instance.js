@@ -1,9 +1,11 @@
 import otfFile from "./font.otf";
 import opentype from "opentype.js";
 import p5 from "p5";
+
 export default (sketch) => {
   let font,
     sampleFactorSlider,
+    saveButton,
     speedXSlider,
     speedYSlider,
     colorPicker,
@@ -44,34 +46,40 @@ export default (sketch) => {
   let xInit = 0;
   let yInit = 0;
   let fontInput;
-  let simplify = 1;
+  let simplify = 0;
   let fillText = true;
   let rainbowMode = false;
   let textInput;
-  let changeButton;
   let textX = w / 2;
   let textY = h / 2;
   let textBoundary;
   let arraySampleFactor = 1;
-  let showFps = false;
+  let showFps = true;
   let showBoundary = false;
+  let dragging = false;
   let presets = [];
 
   // EVENT LISTENERS
 
-  sketch.mouseDragged = () => {
+  sketch.mouseDragged = (e) => {
     const {mouseX, mouseY} = sketch;
-    if (mouseX > 200 && mouseX < w && mouseY > 0 && mouseY < h) {
-      textX = mouseX;
-      textY = mouseY;
-      setTimeout(textSetup(), 500);
+
+    if (e.srcElement.className === "p5Canvas") {
+      if (mouseX > 200 && mouseX < w && mouseY > 0 && mouseY < h) {
+        dragging = true;
+        textX = mouseX;
+        textY = mouseY;
+        setTimeout(textSetup(), 100);
+      }
     }
   };
-
+  sketch.mouseReleased = () => {
+    dragging = false;
+  };
   sketch.windowResized = () => {
     sketch.resizeCanvas(sketch.windowWidth, sketch.windowHeight);
-    w = sketch.windowWidth;
-    h = sketch.windowHeight;
+    w = sketch.width;
+    h = sketch.height;
     textX = w / 2;
     textY = h / 2;
     textSetup();
@@ -92,9 +100,10 @@ export default (sketch) => {
         alert("Could not load font: " + err);
       } else {
         font = sketch.loadFont(file.data);
-        // Use your font here.
       }
     });
+    textX = sketch.width / 2;
+    textY = sketch.height / 2;
     changeText();
   }
   function handleRainbow() {
@@ -102,6 +111,14 @@ export default (sketch) => {
   }
   function handleBoundary() {
     showBoundary = this.checked();
+  }
+
+  function saveImages(num = 1) {
+    // sketch.noLoop();
+    // for (let i = 0; i < num; i++) {
+    //   sketch.save("render/myCanvas" + sketch.frameCount + ".jpg");
+    // }
+    // sketch.loop();
   }
   function handleFPS() {
     showFps = this.checked();
@@ -118,12 +135,12 @@ export default (sketch) => {
     sketch.fill(255);
     textBoundary = font.textBounds(innerText, textX, textY, fontSize);
     textX = textX - textBoundary.w / 2;
-    textY = textY;
+    textY = textY + textBoundary.h / 2;
     textBoundary = font.textBounds(innerText, textX, textY, fontSize);
-    textBoundary.w += 19;
+
     textArray = font.textToPoints(innerText, textX, textY, fontSize, {
       sampleFactor: sampleFactorSlider.value(),
-      simplifyThreshold: 0,
+      simplifyThreshold: simplifySlider.value(),
     });
   }
 
@@ -131,7 +148,7 @@ export default (sketch) => {
     textBoundary = font.textBounds(innerText, textX, textY, fontSize);
     textArray = font.textToPoints(innerText, textX, textY, fontSize, {
       sampleFactor: sampleFactorSlider.value(),
-      simplifyThreshold: 0,
+      simplifyThreshold: simplifySlider.value(),
     });
   }
 
@@ -221,7 +238,7 @@ export default (sketch) => {
   // SETUP UI
   function setupControls() {
     const controlPanel = sketch.select(".controlpanel");
-    textSizeSlider = sketch.createSlider(12, 512, fontSize, 12);
+    textSizeSlider = sketch.createSlider(12, 1024, fontSize, 12);
     textSizeSlider.changed(changeText);
     speedXSlider = sketch.createSlider(0, 0.5, posX, 0.01);
     speedYSlider = sketch.createSlider(0, 0.5, posY, 0.01);
@@ -229,7 +246,8 @@ export default (sketch) => {
     sinYSlider = sketch.createSlider(0, h, sinYRatio, 0.1);
     xInitSlider = sketch.createSlider(-w, w, xInit, 0.1);
     yInitSlider = sketch.createSlider(-h, h, yInit, 0.1);
-    simplifySlider = sketch.createSlider(-1, 2, simplify, 0.1);
+    simplifySlider = sketch.createSlider(0, 0.05, simplify, 0.01);
+    simplifySlider.changed(changeText);
     spacingSlider = sketch.createSlider(0, 2, spacing, 0.05);
     sampleFactorSlider = sketch.createSlider(0.01, 1.5, arraySampleFactor, 0.1);
     sampleFactorSlider.changed(changeText);
@@ -255,33 +273,36 @@ export default (sketch) => {
     textInput.input(handleInput);
     textInput.parent(controlPanel);
 
-    changeButton = sketch.createButton("change text");
-    changeButton.mousePressed(changeText);
-    changeButton.parent(controlPanel);
+    saveButton = sketch.createButton("Save Frame");
+    saveButton.mousePressed(() => {
+      saveImages(5);
+    });
+    saveButton.parent(controlPanel);
 
     centerButton = sketch.createButton("center text");
     centerButton.mousePressed(() => {
-      textX = w / 2;
-      textY = h / 2;
+      textX = sketch.width / 2;
+      textY = sketch.height / 2;
       textSetup();
     });
     centerButton.parent(controlPanel);
 
-    savePresetButton = sketch.createButton("save preset");
+    savePresetButton = sketch.createButton("save state");
     savePresetButton.mousePressed(() => savePreset());
     savePresetButton.parent(controlPanel);
 
-    loadPresetButton = sketch.createButton("load preset");
+    loadPresetButton = sketch.createButton("load state");
     loadPresetButton.mousePressed(() => loadPreset());
     loadPresetButton.parent(controlPanel);
 
     const labels = [
+      {label: "Upload Font (.otf, .ttf)", element: fontInput},
       {
-        label: "Speed X",
+        label: "Animation Speed X",
         element: speedXSlider,
       },
       {
-        label: "Speed Y",
+        label: "Animation Speed Y",
         element: speedYSlider,
       },
       {
@@ -350,20 +371,49 @@ export default (sketch) => {
 
   // MAKE ANIMATION FROM VERTICES
   function makeVertexAnimation() {
-    textArray.forEach(function (val) {
-      let x = val.x;
-      let y = val.y;
-      sinX = sketch.sin(posX);
-      sinX == 0 ? console.log(sinX) : null;
-      sinY = sketch.sin(posY);
-      xAnim = (xInit + x + sinX * sinXRatio) * spacing;
-      yAnim = (yInit + y + sinY * sinYRatio) * spacing;
-      sketch.beginShape(sketch.LINES);
-      sketch.fill(255);
-      sketch.vertex(x, y);
+    textArray.map(function (val) {
+      val.x = Math.floor(val.x);
+      val.y = Math.floor(val.y);
+      sinX = Math.sin(posX);
+      sinY = Math.sin(posY);
+      xAnim = (xInit + val.x + sinX * sinXRatio) * spacing;
+      yAnim = (yInit + val.y + sinY * sinYRatio) * spacing;
+      sketch.beginShape();
+      sketch.vertex(val.x, val.y);
       sketch.vertex(xAnim, yAnim);
       sketch.endShape(sketch.CLOSE);
     });
+  }
+
+  function makeRotateAnimation() {
+    var len = textArray.length;
+
+    while (len--) {
+      let char = innerText[len % innerText.length];
+      let textW = sketch.textWidth(char);
+      sketch.push();
+      sketch.translate(textArray[len].x + xInit, textArray[len].y + yInit);
+      sketch.noStroke();
+      sketch.rectMode(sketch.CORNERS);
+      sketch.fill(lineColor);
+      sketch.textSize(fontSize / 20);
+      sketch.text(char, 0, 0);
+      sketch.pop();
+    }
+  }
+
+  function makeVertexWhileLoop() {
+    var len = textArray.length;
+    while (len--) {
+      sinX = Math.sin(posX);
+      sinY = Math.sin(posY);
+      xAnim = (xInit + textArray[len].x + sinX * sinXRatio) * spacing;
+      yAnim = (yInit + textArray[len].y + sinY * sinYRatio) * spacing;
+      sketch.beginShape();
+      sketch.vertex(textArray[len].x, textArray[len].y);
+      sketch.vertex(xAnim, yAnim);
+      sketch.endShape(sketch.CLOSE);
+    }
   }
 
   // SHOW/HIDE VISUAL ELEMENTS
@@ -437,21 +487,27 @@ export default (sketch) => {
   };
 
   sketch.setup = () => {
+    console.log(font);
     sketch.createCanvas(w - 200, h);
+
     sketch.pixelDensity(1);
-    textX = w / 2;
-    textY = h / 2;
+    textX = sketch.width / 2;
+    textY = sketch.height / 2;
     textSetup();
     setTimeout(savePreset, 100);
+    updateValues();
   };
 
   sketch.draw = () => {
     updateValues();
     sketch.background(bgColor);
     showFps ? showFPS() : null;
-    showBoundary ? showBoundingBox() : null;
+    showBoundary || dragging ? showBoundingBox() : null;
     sketch.noStroke();
     !rainbowMode ? sketch.stroke(lineColor) : runRainbowMode();
+    //makeVertexWhileLoop();
+    //makeRotateAnimation();
+
     makeVertexAnimation();
     fillText ? showFillText() : null;
   };
