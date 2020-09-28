@@ -114,11 +114,11 @@ export default (sketch) => {
   }
 
   function saveImages(num = 1) {
-    sketch.noLoop();
-    for (let i = 0; i < num; i++) {
-      sketch.save("render/myCanvas" + sketch.frameCount + ".jpg");
-    }
-    sketch.loop();
+    // sketch.noLoop();
+    // for (let i = 0; i < num; i++) {
+    //   sketch.save("render/myCanvas" + sketch.frameCount + ".jpg");
+    // }
+    // sketch.loop();
   }
   function handleFPS() {
     showFps = this.checked();
