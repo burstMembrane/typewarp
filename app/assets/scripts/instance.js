@@ -32,18 +32,21 @@ export default (sketch) => {
     xAnim,
     yAnim,
     fillColor,
-    lineColor;
+    lineColor,
+    fontInput;
+
   let strokeWeight = 1;
   let controlPanel = document.querySelector(".controlpanel");
   let controlpanelWidth = controlPanel.clientWidth;
   let controlpanelHeight = controlPanel.clientHeight;
   let showCrosshair = false;
-
   let textArray = [];
   let w = window.innerWidth;
-  let h =
-    w < 600 ? window.innerHeight - controlpanelHeight : window.innerHeight;
-  let fontSize = w < 600 ? w / 2.8 : w / 4;
+  let isMobile = w < 600;
+  // !isMobile ? (w = w - controlpanelWidth) : null;
+  let h = window.innerHeight - (isMobile ? controlpanelHeight : 0);
+
+  let fontSize = isMobile ? w / 2.8 : w / 4;
   let posX = 0.01;
   let posY = 0;
   let innerText = "HEAT";
@@ -52,8 +55,7 @@ export default (sketch) => {
   let spacing = 0.95;
   let xInit = 0;
   let yInit = 0;
-  let fontInput;
-  let simplify = 0;
+
   let fillText = true;
   let rainbowMode = false;
   let textInput;
@@ -95,10 +97,6 @@ export default (sketch) => {
 
   // INPUT HANDLERS
 
-  function handleCheck() {
-    fillText = this.checked();
-  }
-
   function handleFile(file) {
     console.log(font);
     const p5Font = new p5.Font();
@@ -114,12 +112,6 @@ export default (sketch) => {
     textY = sketch.height / 2;
     changeText();
   }
-  function handleRainbow() {
-    rainbowMode = this.checked();
-  }
-  function handleBoundary() {
-    showBoundary = this.checked();
-  }
 
   function saveImages(num = 1) {
     sketch.noLoop();
@@ -128,9 +120,7 @@ export default (sketch) => {
     }
     sketch.loop();
   }
-  function handleFPS() {
-    showFps = this.checked();
-  }
+
   function handleInput(e) {
     e.preventDefault();
     innerText = this.value();
@@ -239,11 +229,11 @@ export default (sketch) => {
       elementLabel.setAttribute("for", id);
       //elementLabel.innerText = label.label + ": " + label.element.value();
       elementLabel.innerText = label.label;
-      if (w < 600) {
+      if (isMobile) {
         document.querySelector(".controlpanel").appendChild(formgroup);
-        fontInput.elt.style.display = "none";
         formgroup.appendChild(elementLabel);
         formgroup.appendChild(label.element.elt);
+        fontInput.hide();
       } else {
         document.querySelector(".controlpanel").appendChild(elementLabel);
         label.element.parent(sketch.select(".controlpanel"));
@@ -271,7 +261,7 @@ export default (sketch) => {
     textColorPicker = sketch.createColorPicker("#fff");
     bgColourPicker = sketch.createColorPicker("#1f1f1f");
 
-    rainbow = sketch.createCheckbox("Rainbow Mode!", rainbowMode);
+    rainbow = sketch.createCheckbox("Rainbow Mode", rainbowMode);
     rainbow.changed(() => (rainbowMode = !rainbowMode));
     rainbow.parent(controlPanel);
 
@@ -306,7 +296,7 @@ export default (sketch) => {
 
     saveButton = sketch.createButton("Save Frame");
     saveButton.mousePressed(() => {
-      saveImages(1);
+      // saveImages(1);
     });
     saveButton.parent(controlPanel);
 
@@ -379,7 +369,6 @@ export default (sketch) => {
         label: "Background Colour",
         element: bgColourPicker,
       },
-      {label: "Upload OpenType Font ", element: fontInput},
       {
         label: "",
         element: rainbow,
@@ -406,6 +395,10 @@ export default (sketch) => {
       },
     ];
 
+    if (w > 600) {
+      labels.push({label: "Upload OpenType Font ", element: fontInput});
+    }
+
     updateLabels(labels);
   }
 
@@ -417,6 +410,7 @@ export default (sketch) => {
       val.y = Math.floor(val.y);
       sinX = Math.sin(posX);
       sinY = Math.sin(posY);
+      sketch.stroke(lineColor);
       sketch.strokeCap(sketch.ROUND);
       sketch.strokeWeight(strokeWeight);
       xAnim = (xInit + val.x + sinX * sinXRatio) * spacing;
@@ -530,13 +524,13 @@ export default (sketch) => {
   }
 
   function runRainbowMode() {
-    let hue = sketch.frameCount % 100;
-
+    let hue = (sketch.millis() / 100) % 100;
+    sketch.colorMode(sketch.HSB, 100);
     let rainbowFill = sketch.color(hue, 100, 100);
-    console.log(sketch.hex(rainbowFill));
-    colorPicker.value(sketch.hex(rainbowFill));
-    textColorPicker.value(sketch.hex(rainbowFill));
-    // sketch.stroke(sketch.color(hue, 50, 100));
+    let rainbowLine = sketch.color(hue, 100, 50);
+
+    fillColor = rainbowFill;
+    lineColor = rainbowLine;
   }
 
   // p5 functions
@@ -546,7 +540,6 @@ export default (sketch) => {
   };
 
   sketch.setup = () => {
-    console.log(font);
     sketch.createCanvas(w, h);
 
     sketch.pixelDensity(1);

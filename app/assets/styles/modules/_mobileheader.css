@@ -1,0 +1,24 @@
+.mobileheader {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 70px;
+  background-color: $mainBackground;
+  box-shadow: $boxShadow;
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  h2 {
+    margin: 0;
+    padding: 0;
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+  a {
+    margin: 0;
+    display: block;
+    text-decoration: none;
+    color: $mainForeground;
+  }
+}
