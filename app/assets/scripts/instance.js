@@ -41,7 +41,8 @@ export default (sketch) => {
   let controlpanelHeight = controlPanel.clientHeight;
   let showCrosshair = false;
   let textArray = [];
-  let w = sketch.innerWssssidt;
+  let w = window.innerWidth;
+
   let isMobile = w < 600;
   // !isMobile ? (w = w - controlpanelWidth) : null;
   let h = window.innerHeight - (isMobile ? controlpanelHeight : 0);
@@ -528,7 +529,6 @@ export default (sketch) => {
     sketch.colorMode(sketch.HSB, 100);
     let rainbowFill = sketch.color(hue, 100, 100);
     let rainbowLine = sketch.color(hue, 100, 50);
-
     fillColor = rainbowFill;
     lineColor = rainbowLine;
   }
@@ -541,10 +541,8 @@ export default (sketch) => {
 
   sketch.setup = () => {
     sketch.createCanvas(w, h);
-
-    sketch.pixelDensity(1);
     textX = sketch.width / 2;
-    textY = sketch.width / 2;
+    textY = sketch.height / 2;
     textSetup();
     setTimeout(savePreset, 100);
     updateValues();
@@ -557,12 +555,8 @@ export default (sketch) => {
     showBoundary || dragging ? showBoundingBox() : null;
     sketch.noStroke();
     !rainbowMode ? sketch.stroke(lineColor) : runRainbowMode();
-    // makeVertexWhileLoop();
-    //makeRotateAnimation();
-
     makeVertexAnimation();
     fillText ? showFillText() : null;
-
     showCrosshair ? drawCrossHair() : null;
   };
 };
