@@ -3,53 +3,26 @@
 $mainBackground: rgba(31, 31, 31, 0.8);
 $mainForeground: rgb(218, 218, 218);
 .controlpanel {
-  input[type="range"] {
-    -webkit-appearance: none;
-    outline: none;
-    cursor: pointer;
-    background-color: transparent;
-    &::-webkit-slider-runnable-track {
-      width: 100%;
-      height: 15px;
-      cursor: pointer;
-      background: rgba(134, 134, 134, 0.1);
-      border-radius: 5px;
-    }
-    &::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      border: 1px solid #000000;
-      height: 100%;
-      width: 16px;
-      border-radius: 10px;
-      background: #ffffff;
-      cursor: pointer;
-      margin-top: 0px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
-      &:hover {
-        background-color: #dfdfdf;
-        transition: transform 0.3s ease-out;
-        transform: scale(1.1);
-      }
-    }
-  }
-
   @mixin atSmall {
+    height: 100vh;
+    margin: 0;
     z-index: 99999;
+    position: fixed;
+    top: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
     backdrop-filter: blur(2px);
     transform: translateX(0%);
     transition: 0.3s transform ease-in;
     box-shadow: $boxShadow;
-    user-select: none; /* Standard syntax */
+    user-select: none;
+
     display: flex;
     flex-direction: column;
-
-    justify-content: space-evenly;
+    justify-content: space-between;
     max-width: 200px;
-    font-weight: 400;
-
     background: $mainBackground;
     color: $mainForeground;
-    font-family: "Roboto", sans-serif;
-
     a {
       text-decoration: none;
       color: white;
@@ -141,18 +114,44 @@ $mainForeground: rgb(218, 218, 218);
     z-index: 999999;
     position: absolute;
     top: 0;
-    left: 200px;
+    left: 190px;
     border-radius: 0px 5px 5px 0px;
-
     width: 10px;
-
     padding: 5px 2px;
     background-color: $mainBackground;
-    color: #414141;
+    color: #888888;
     box-shadow: $boxShadow;
     &:hover {
       cursor: pointer;
       transform: scale(1.1);
+    }
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+    background-color: transparent;
+    &::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 15px;
+      cursor: pointer;
+      background: rgba(134, 134, 134, 0.1);
+      border-radius: 5px;
+    }
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      border: 1px solid #000000;
+      height: 100%;
+      width: 16px;
+      border-radius: 10px;
+      background: #ffffff;
+      cursor: pointer;
+      margin-top: 0px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+      &:hover {
+        background-color: #dfdfdf;
+        transition: transform 0.3s ease-out;
+        transform: scale(1.1);
+      }
     }
   }
 }

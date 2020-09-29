@@ -88,12 +88,14 @@ export default (sketch) => {
     dragging = false;
   };
   sketch.windowResized = () => {
-    sketch.resizeCanvas(sketch.windowWidth, sketch.windowHeight);
-    w = sketch.width - controlpanelWidth;
-    h = sketch.height;
-    textX = w / 2;
-    textY = h / 2;
-    textSetup();
+    setTimeout(() => {
+      sketch.resizeCanvas(sketch.windowWidth, sketch.windowHeight);
+      w = sketch.width;
+      h = sketch.height;
+      textX = w / 2;
+      textY = h / 2;
+      textSetup();
+    }, 50);
   };
 
   // INPUT HANDLERS
@@ -125,7 +127,7 @@ export default (sketch) => {
   function handleInput(e) {
     e.preventDefault();
     innerText = this.value();
-    changeText();
+    //changeText();
   }
 
   // TEXT SETUP
@@ -134,8 +136,9 @@ export default (sketch) => {
     sketch.textSize(fontSize);
     sketch.fill(255);
     textBoundary = font.textBounds(innerText, textX, textY, fontSize);
-    textX = textX - textBoundary.w / 2;
-    textY = textY + textBoundary.h / 2;
+
+    textX -= textBoundary.w / 2;
+    textY += textBoundary.h / 2;
     textBoundary = font.textBounds(innerText, textX, textY, fontSize);
 
     textArray = font.textToPoints(innerText, textX, textY, fontSize, {
@@ -260,7 +263,7 @@ export default (sketch) => {
     sampleFactorSlider.changed(changeText);
     colorPicker = sketch.createColorPicker("#ff0048");
     textColorPicker = sketch.createColorPicker("#fff");
-    bgColourPicker = sketch.createColorPicker("#1f1f1f");
+    bgColourPicker = sketch.createColorPicker("#3f3f3f");
 
     rainbow = sketch.createCheckbox("Rainbow Mode", rainbowMode);
     rainbow.changed(() => (rainbowMode = !rainbowMode));
@@ -297,7 +300,7 @@ export default (sketch) => {
 
     saveButton = sketch.createButton("Save Frame");
     saveButton.mousePressed(() => {
-      // saveImages(1);
+      saveImages(1);
     });
     saveButton.parent(controlPanel);
 
@@ -543,8 +546,8 @@ export default (sketch) => {
     sketch.createCanvas(w, h);
     textX = sketch.width / 2;
     textY = sketch.height / 2;
-    textSetup();
-    setTimeout(savePreset, 100);
+    // wait for vars to initialize
+    setTimeout(textSetup, 50);
     updateValues();
   };
 
@@ -556,7 +559,7 @@ export default (sketch) => {
     sketch.noStroke();
     !rainbowMode ? sketch.stroke(lineColor) : runRainbowMode();
     makeVertexAnimation();
-    fillText ? showFillText() : null;
+    fillText && textBoundary ? showFillText() : null;
     showCrosshair ? drawCrossHair() : null;
   };
 };
