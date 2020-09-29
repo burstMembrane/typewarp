@@ -41,7 +41,7 @@ export default (sketch) => {
   let controlpanelHeight = controlPanel.clientHeight;
   let showCrosshair = false;
   let textArray = [];
-  let w = window.innerWidth;
+  let w = sketch.innerWssssidt;
   let isMobile = w < 600;
   // !isMobile ? (w = w - controlpanelWidth) : null;
   let h = window.innerHeight - (isMobile ? controlpanelHeight : 0);
@@ -59,8 +59,8 @@ export default (sketch) => {
   let fillText = true;
   let rainbowMode = false;
   let textInput;
-  let textX = w / 2;
-  let textY = h / 2;
+  let textX;
+  let textY;
   let textBoundary;
   let arraySampleFactor = 1;
   let showFps = false;
@@ -544,7 +544,7 @@ export default (sketch) => {
 
     sketch.pixelDensity(1);
     textX = sketch.width / 2;
-    textY = sketch.height / 2;
+    textY = sketch.width / 2;
     textSetup();
     setTimeout(savePreset, 100);
     updateValues();
