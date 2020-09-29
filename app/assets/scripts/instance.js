@@ -36,12 +36,14 @@ export default (sketch) => {
   let strokeWeight = 1;
   let controlPanel = document.querySelector(".controlpanel");
   let controlpanelWidth = controlPanel.clientWidth;
+  let controlpanelHeight = controlPanel.clientHeight;
   let showCrosshair = false;
 
   let textArray = [];
   let w = window.innerWidth;
-  let h = window.innerHeight;
-  let fontSize = w < 600 ? w / 2.2 : w / 4;
+  let h =
+    w < 600 ? window.innerHeight - controlpanelHeight : window.innerHeight;
+  let fontSize = w < 600 ? w / 2.8 : w / 4;
   let posX = 0.01;
   let posY = 0;
   let innerText = "HEAT";
@@ -120,16 +122,17 @@ export default (sketch) => {
   }
 
   function saveImages(num = 1) {
-    // sketch.noLoop();
-    // for (let i = 0; i < num; i++) {
-    //   sketch.save("render/myCanvas" + sketch.frameCount + ".jpg");
-    // }
-    // sketch.loop();
+    sketch.noLoop();
+    for (let i = 0; i < num; i++) {
+      sketch.save("render/myCanvas" + sketch.frameCount + ".jpg");
+    }
+    sketch.loop();
   }
   function handleFPS() {
     showFps = this.checked();
   }
-  function handleInput() {
+  function handleInput(e) {
+    e.preventDefault();
     innerText = this.value();
     changeText();
   }
@@ -230,14 +233,20 @@ export default (sketch) => {
       let elementLabel = document.createElement("label");
       label.element.name = label.label;
       const id = label.element.name;
+      const formgroup = document.createElement("div");
+      formgroup.classList.add("formgroup");
       label.element.elt.id = id;
-
+      elementLabel.setAttribute("for", id);
       //elementLabel.innerText = label.label + ": " + label.element.value();
       elementLabel.innerText = label.label;
-
-      elementLabel.setAttribute("for", id);
-      document.querySelector(".controlpanel").appendChild(elementLabel);
-      label.element.parent(sketch.select(".controlpanel"));
+      if (w < 600) {
+        document.querySelector(".controlpanel").appendChild(formgroup);
+        formgroup.appendChild(elementLabel);
+        formgroup.appendChild(label.element.elt);
+      } else {
+        document.querySelector(".controlpanel").appendChild(elementLabel);
+        label.element.parent(sketch.select(".controlpanel"));
+      }
     });
   }
 
@@ -295,7 +304,7 @@ export default (sketch) => {
 
     saveButton = sketch.createButton("Save Frame");
     saveButton.mousePressed(() => {
-      saveImages(5);
+      saveImages(1);
     });
     saveButton.parent(controlPanel);
 
@@ -394,6 +403,7 @@ export default (sketch) => {
         element: boundCheckbox,
       },
     ];
+
     updateLabels(labels);
   }
 
