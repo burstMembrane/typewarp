@@ -33,7 +33,6 @@ $mainForeground: rgb(218, 218, 218);
   }
 
   @mixin atSmall {
-    padding-top: 3rem;
     z-index: 99999;
     backdrop-filter: blur(2px);
     transform: translateX(0%);
