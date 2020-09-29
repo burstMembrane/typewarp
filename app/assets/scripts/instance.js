@@ -241,6 +241,7 @@ export default (sketch) => {
       elementLabel.innerText = label.label;
       if (w < 600) {
         document.querySelector(".controlpanel").appendChild(formgroup);
+        fontInput.elt.style.display = "none";
         formgroup.appendChild(elementLabel);
         formgroup.appendChild(label.element.elt);
       } else {
@@ -299,6 +300,7 @@ export default (sketch) => {
     textInput = sketch.createInput(innerText);
     textInput.input(handleInput);
     textInput.parent(controlPanel);
+
     fontInput = sketch.createFileInput(handleFile);
     fontInput.parent(controlPanel);
 
