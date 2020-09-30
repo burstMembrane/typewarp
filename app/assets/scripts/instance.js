@@ -74,7 +74,6 @@ export default (sketch) => {
 
   sketch.mouseDragged = (e) => {
     const {mouseX, mouseY} = sketch;
-
     if (e.srcElement.className === "p5Canvas") {
       if (mouseX > 200 && mouseX < w && mouseY > 0 && mouseY < h) {
         dragging = true;
