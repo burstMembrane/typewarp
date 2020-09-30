@@ -1,4 +1,4 @@
-import otfFile from "./font.otf";
+import otfFile from "../fonts/font.otf";
 import opentype from "opentype.js";
 import p5 from "p5";
 export default (sketch) => {
@@ -432,7 +432,6 @@ export default (sketch) => {
 
     while (len--) {
       let char = innerText[len % innerText.length];
-      let textW = sketch.textWidth(char);
       sketch.push();
       sketch.translate(textArray[len].x + xInit, textArray[len].y + yInit);
       sketch.noStroke();
