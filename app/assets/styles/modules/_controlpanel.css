@@ -160,6 +160,7 @@ $mainForeground: rgb(218, 218, 218);
   .controlpanel {
     background-color: $mainBackground;
     box-shadow: $boxShadow;
+    color: white;
     display: flex;
     width: 100vw;
     height: 130px;
