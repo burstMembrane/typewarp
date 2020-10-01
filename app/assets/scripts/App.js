@@ -2,7 +2,7 @@
 import "../styles/styles.css";
 // import p5 from "p5/lib/p5.min.js";
 import p5 from "p5/lib/p5.min.js";
-
+import "regenerator/runtime";
 import s from "./instance";
 
 new p5(s);
