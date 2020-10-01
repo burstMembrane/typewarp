@@ -14,6 +14,7 @@
     padding: 0;
     font-size: 2.5rem;
     line-height: 1;
+    color: $mainForeground;
   }
   a {
     margin: 0;
