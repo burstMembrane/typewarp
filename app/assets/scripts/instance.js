@@ -223,11 +223,13 @@ export default (sketch) => {
       elementLabel.setAttribute('for', id)
       elementLabel.innerText = label.label
       if (isMobile) {
+        // different css rules on mobile layout
         document.querySelector('.controlpanel').appendChild(formgroup)
         formgroup.appendChild(elementLabel)
         formgroup.appendChild(label.element.elt)
         fontInput.hide()
       } else {
+        // add labels to elements
         document.querySelector('.controlpanel').appendChild(elementLabel)
         label.element.parent(sketch.select('.controlpanel'))
       }
@@ -239,60 +241,44 @@ export default (sketch) => {
     const controlPanel = sketch.select('.controlpanel')
     textSizeSlider = sketch.createSlider(12, 1024, fontSize, 12)
     textSizeSlider.changed(changeText)
-    textSizeSlider.label = 'Text Size'
-
     speedXSlider = sketch.createSlider(0, 0.5, posX, 0.01)
     speedYSlider = sketch.createSlider(0, 0.5, posY, 0.01)
-    speedYSlider.label = 'Speed Y Slider'
-
     sinXSlider = sketch.createSlider(0, w, sinXRatio, 0.1)
     sinYSlider = sketch.createSlider(0, h, sinYRatio, 0.1)
     xInitSlider = sketch.createSlider(-w, w, xInit, 0.1)
     yInitSlider = sketch.createSlider(-h, h, yInit, 0.1)
     strokeWeightSlider = sketch.createSlider(1, 15, strokeWeight, 1)
-
     spacingSlider = sketch.createSlider(0, 2, spacing, 0.05)
     sampleFactorSlider = sketch.createSlider(0.01, 1.5, arraySampleFactor, 0.1)
     sampleFactorSlider.changed(changeText)
     colorPicker = sketch.createColorPicker('#ff0048')
     textColorPicker = sketch.createColorPicker('#fff')
     bgColourPicker = sketch.createColorPicker('#3f3f3f')
-
     rainbow = sketch.createCheckbox('Rainbow Mode', rainbowMode)
     rainbow.changed(() => (rainbowMode = !rainbowMode))
     rainbow.parent(controlPanel)
-
     fillCheckbox = sketch.createCheckbox('Fill Text', fillText)
     fillCheckbox.changed(() => (fillText = !fillText))
     fillCheckbox.parent(controlPanel)
-
     fpsCheckbox = sketch.createCheckbox('FPS', showFps)
     fpsCheckbox.changed(() => (showFps = !showFps))
     fpsCheckbox.parent(controlPanel)
-
     crosshairCheckbox = sketch.createCheckbox('Crosshair', showCrosshair)
     crosshairCheckbox.changed(() => (showCrosshair = !showCrosshair))
     crosshairCheckbox.parent(controlPanel)
-
     fillTextStrokeCheckbox = sketch.createCheckbox('Fill Text Stroke', fillTextStroke)
     fillTextStrokeCheckbox.changed(() => (fillTextStroke = !fillTextStroke))
     fillTextStrokeCheckbox.parent(controlPanel)
-
     boundCheckbox = sketch.createCheckbox('Bounding Box', showBoundary)
     boundCheckbox.changed(() => (showBoundary = !showBoundary))
-
     textInput = sketch.createInput(innerText)
     textInput.input((e) => handleInput(e))
     textInput.parent(controlPanel)
-
     fontInput = sketch.createFileInput((e) => handleFile(e))
     fontInput.parent(controlPanel)
-
     saveButton = sketch.createButton('Save Frame')
     saveButton.mousePressed(() => saveImages(1))
-
     saveButton.parent(controlPanel)
-
     centerButton = sketch.createButton('center text')
     centerButton.mousePressed(() => {
       textX = sketch.width / 2
@@ -300,11 +286,9 @@ export default (sketch) => {
       textSetup()
     })
     centerButton.parent(controlPanel)
-
     savePresetButton = sketch.createButton('save state')
     savePresetButton.mousePressed(() => savePreset())
     savePresetButton.parent(controlPanel)
-
     loadPresetButton = sketch.createButton('load state')
     loadPresetButton.mousePressed(() => loadPreset())
     loadPresetButton.parent(controlPanel)
