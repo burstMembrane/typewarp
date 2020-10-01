@@ -1,7 +1,11 @@
 import otfFile from "../fonts/font.otf";
+import roboto from "../fonts/Roboto-Medium.ttf";
 import opentype from "opentype.js";
 import p5 from "p5";
+import textToPoints from "./p5_textToPoints";
+
 export default (sketch) => {
+  p5.Font.prototype.textToPoints = textToPoints;
   let font,
     sampleFactorSlider,
     saveButton,
@@ -34,26 +38,27 @@ export default (sketch) => {
     fillColor,
     lineColor,
     fontInput;
-
+  let fontBasename = "font";
+  let errText = "";
   let strokeWeight = 1;
   let controlPanel = document.querySelector(".controlpanel");
   let controlpanelWidth = controlPanel.clientWidth;
   let controlpanelHeight = controlPanel.clientHeight;
   let showCrosshair = false;
   let textArray = [];
+  let fillArray = [];
   let w = window.innerWidth;
-
   let isMobile = w < 600;
-  // !isMobile ? (w = w - controlpanelWidth) : null;
+  //!isMobile ? (w = w - controlpanelWidth) : null;
   let h = window.innerHeight - (isMobile ? controlpanelHeight : 0);
 
   let fontSize = isMobile ? w / 2.8 : w / 4;
-  let posX = 0.01;
+  let posX = 0;
   let posY = 0;
   let innerText = "HEAT";
   let sinXRatio = 53.3;
   let sinYRatio = 0;
-  let spacing = 0.95;
+  let spacing = 1;
   let xInit = 0;
   let yInit = 0;
 
@@ -79,7 +84,7 @@ export default (sketch) => {
         dragging = true;
         textX = mouseX;
         textY = mouseY;
-        setTimeout(textSetup(), 100);
+        setTimeout(textSetup(), 50);
       }
     }
   };
@@ -94,25 +99,34 @@ export default (sketch) => {
       textX = w / 2;
       textY = h / 2;
       textSetup();
-    }, 50);
+    }, 100);
   };
 
-  // INPUT HANDLERS
+  async function handleFile(file) {
+    const fallBack = font;
+    try {
+      fontBasename = file.name.split(".")[0];
+      console.log();
+      const newFont = await opentype.load(file.data);
+      newFont.defaultRenderOptions.kerning = false;
 
-  function handleFile(file) {
-    console.log(font);
-    const p5Font = new p5.Font();
-    console.log(p5Font);
-    opentype.load(file.data, function (err, newFont) {
-      if (err) {
-        alert("Could not load font: " + err);
-      } else {
-        font = sketch.loadFont(file.data);
-      }
-    });
-    textX = sketch.width / 2;
-    textY = sketch.height / 2;
-    changeText();
+      const p5Font = new p5.Font(sketch);
+      p5Font.font = newFont;
+      console.log(p5Font);
+      font = p5Font;
+      w = sketch.width;
+      h = sketch.height;
+      textX = w / 2;
+      textY = h / 2;
+      console.log(p5Font);
+      changeText();
+    } catch (error) {
+      errText = "Unsupported Font!";
+      setTimeout(() => {
+        errText = "";
+      }, 1000);
+      font = fallBack;
+    }
   }
 
   function saveImages(num = 1) {
@@ -123,31 +137,48 @@ export default (sketch) => {
     sketch.loop();
   }
 
+  function showError(errText) {
+    sketch.push();
+    sketch.fill(255);
+    sketch.noStroke();
+    sketch.textSize(16);
+    sketch.text(errText, sketch.width / 2, 100);
+    sketch.pop();
+    console.log(errText);
+  }
+
   function handleInput(e) {
     e.preventDefault();
     innerText = this.value();
-    //changeText();
+    changeText();
   }
 
   // TEXT SETUP
   function textSetup() {
-    sketch.textStyle(sketch.BOLD);
-    sketch.textSize(fontSize);
-    sketch.fill(255);
+    // possible fix for opentype font not correct width
+
     textBoundary = font.textBounds(innerText, textX, textY, fontSize);
 
     textX -= textBoundary.w / 2;
+
     textY += textBoundary.h / 2;
+    // remake textboundary after centering text
     textBoundary = font.textBounds(innerText, textX, textY, fontSize);
 
     textArray = font.textToPoints(innerText, textX, textY, fontSize, {
       sampleFactor: sampleFactorSlider.value(),
       simplifyThreshold: 0,
     });
+    // fillArray = font.textToPoints(innerText, textX, textY, fontSize, {
+    //   sampleFactor: 10,
+    //   simplifyThreshold: 0.1,
+    //   separatePaths: true, // new option
+    // });
   }
 
   function changeText() {
     textBoundary = font.textBounds(innerText, textX, textY, fontSize);
+
     textArray = font.textToPoints(innerText, textX, textY, fontSize, {
       sampleFactor: sampleFactorSlider.value(),
       simplifyThreshold: 0,
@@ -421,7 +452,7 @@ export default (sketch) => {
       sketch.beginShape();
       sketch.vertex(val.x, val.y);
       sketch.vertex(xAnim, yAnim);
-      sketch.endShape(sketch.CLOSE);
+      sketch.endShape();
       sketch.pop();
     });
   }
@@ -434,7 +465,7 @@ export default (sketch) => {
       sketch.push();
       sketch.translate(textArray[len].x + xInit, textArray[len].y + yInit);
       sketch.noStroke();
-      sketch.rectMode(sketch.CORNERS);
+
       sketch.fill(lineColor);
       sketch.textSize(fontSize / 20);
       sketch.text(char, 0, 0);
@@ -474,13 +505,9 @@ export default (sketch) => {
     sketch.push();
     sketch.noFill();
     sketch.stroke(255);
-    sketch.rect(textBoundary.x, textBoundary.y, textBoundary.w, textBoundary.h);
-    sketch.ellipse(
-      textBoundary.x + textBoundary.w / 2,
-      textBoundary.y + textBoundary.h / 2,
-      10,
-      10
-    );
+    sketch.translate(textBoundary.x, textBoundary.y);
+    sketch.rect(0, 0, textBoundary.w, textBoundary.h);
+    sketch.ellipse(0 + textBoundary.w / 2, 0 + textBoundary.h / 2, 10, 10);
     sketch.pop();
   }
 
@@ -495,13 +522,36 @@ export default (sketch) => {
 
     sketch.pop();
   }
+  function drawOpenTypePath() {
+    const path = font.font.getPath(innerText, textX, textY, fontSize);
+
+    // If you just want to draw the text you can also use font.draw(ctx, text, x, y, fontSize).
+
+    // path.fill = fillColor;
+    font.font.draw(sketch.drawingContext, innerText, textX, textY, fontSize);
+    path.draw(sketch.drawingContext);
+    font.font.drawMetrics(
+      sketch.drawingContext,
+      innerText,
+      textX,
+      textY,
+      fontSize
+    );
+  }
+
   function showFillText() {
     sketch.push();
+    sketch.noStroke();
     sketch.textFont(font);
+    sketch.textSize(fontSize);
     sketch.strokeWeight(strokeWeight);
-    fillTextStroke ? sketch.stroke(fillColor) : sketch.noStroke();
 
+    fillTextStroke ? sketch.stroke(fillColor) : sketch.noStroke();
+    sketch.drawingContext.fillStyle = fillColor;
+    sketch.drawingContext.font = `${fontSize}px ${fontBasename} `;
     sketch.fill(fillColor);
+    //sketch.drawingContext.textAlign = "start";
+    //sketch.drawingContext.fillText(innerText, textX, textY, 1200);
     sketch.text(innerText, textX, textY);
     sketch.pop();
   }
@@ -510,7 +560,7 @@ export default (sketch) => {
   function updateValues() {
     strokeWeight = strokeWeightSlider.value();
     fontSize = textSizeSlider.value();
-    sketch.textSize(fontSize);
+
     sinXRatio = sinXSlider.value();
     sinYRatio = sinYSlider.value();
     xInit = xInitSlider.value();
@@ -525,6 +575,23 @@ export default (sketch) => {
     fillColor = textColorPicker.color();
   }
 
+  function drawPoints() {
+    // display new 2d array method as solid
+    sketch.push();
+    sketch.translate(0, 0);
+    sketch.fill(fillColor);
+    sketch.noStroke(255);
+    for (let i = 0; i < fillArray.length; i++) {
+      sketch.beginShape();
+      for (let j = 0; j < fillArray[i].length; j++) {
+        let p = fillArray[i][j];
+
+        sketch.vertex(p.x, p.y);
+      }
+      sketch.endShape(sketch.CLOSE);
+    }
+    sketch.pop();
+  }
   function runRainbowMode() {
     let hue = (sketch.millis() / 100) % 100;
     sketch.colorMode(sketch.HSB, 100);
@@ -541,7 +608,9 @@ export default (sketch) => {
   };
 
   sketch.setup = () => {
+    console.log(font);
     sketch.createCanvas(w, h);
+    console.log(sketch);
     textX = sketch.width / 2;
     textY = sketch.height / 2;
     // wait for vars to initialize
@@ -557,7 +626,11 @@ export default (sketch) => {
     sketch.noStroke();
     !rainbowMode ? sketch.stroke(lineColor) : runRainbowMode();
     makeVertexAnimation();
+    //drawPoints();
     fillText && textBoundary ? showFillText() : null;
     showCrosshair ? drawCrossHair() : null;
+    // textBoundary && showBoundingBox();
+    errText && showError(errText);
+    //drawOpenTypePath();
   };
 };
