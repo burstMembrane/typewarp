@@ -4,6 +4,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const fse = require('fs-extra')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 // make a new HtmlWebpack plugin for each file in the app folder
 let pages = fse
@@ -18,15 +19,6 @@ let pages = fse
         template: `./app/${page}`
       })
   )
-
-// copy images to dist folder after build
-// class RunAfterCompile {
-//   apply(compiler) {
-//     compiler.hooks.done.tap('Copy Images', () => {
-//       fse.copySync('./app/assets/images', './dist/assets/images')
-//     })
-//   }
-// }
 
 let cssConfig = {
   test: /\.css$/i,
@@ -99,7 +91,8 @@ if (currentTask == 'build') {
   config.optimization = {
     splitChunks: {
       chunks: 'all'
-    }
+    },
+    minimizer: [new UglifyJsPlugin()]
   }
   config.plugins = [
     ...config.plugins,

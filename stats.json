@@ -1,0 +1,14 @@
+
+> webpackscaffold@1.0.0 build /home/liam/typewarp
+> webpack "–json"
+
+Hash: 549feef1a5f3e0b5be05
+Version: webpack 4.44.2
+Time: 94ms
+Built at: 02/10/2020 1:11:31 am
+
+ERROR in Entry module not found: Error: Can't resolve '–json' in '/home/liam/typewarp'
+Child HtmlWebpackCompiler:
+     1 asset
+    Entrypoint HtmlWebpackPlugin_0 = __child-HtmlWebpackPlugin_0
+    [0] ./node_modules/html-webpack-plugin/lib/loader.js!./app/index.html 791 bytes {0} [built]
