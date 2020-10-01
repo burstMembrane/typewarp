@@ -40,7 +40,7 @@ export default (sketch) => {
     fontInput;
   let fontBasename = "font";
   let errText = "";
-  let strokeWeight = 1;
+  let strokeWeight = 4;
   let controlPanel = document.querySelector(".controlpanel");
   let controlpanelWidth = controlPanel.clientWidth;
   let controlpanelHeight = controlPanel.clientHeight;
@@ -58,7 +58,7 @@ export default (sketch) => {
   let innerText = "HEAT";
   let sinXRatio = 53.3;
   let sinYRatio = 0;
-  let spacing = 1;
+  let spacing = 0.95;
   let xInit = 0;
   let yInit = 0;
 
@@ -68,7 +68,7 @@ export default (sketch) => {
   let textX;
   let textY;
   let textBoundary;
-  let arraySampleFactor = 1;
+  let arraySampleFactor = 0.3;
   let showFps = false;
   let showBoundary = false;
   let dragging = false;
