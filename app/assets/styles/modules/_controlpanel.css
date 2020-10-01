@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 $mainBackground: rgba(31, 31, 31, 0.8);
 $mainForeground: rgb(218, 218, 218);
@@ -42,7 +42,7 @@ $mainForeground: rgb(218, 218, 218);
       outline: none;
       margin-bottom: 10px;
       margin: 5px auto;
-      &[type="text"] {
+      &[type='text'] {
         width: 80%;
         background: transparent;
         border: none;
@@ -52,12 +52,12 @@ $mainForeground: rgb(218, 218, 218);
         line-height: 1.5;
         padding: 5px;
       }
-      &[type="file"] {
+      &[type='file'] {
         width: 100px;
         box-shadow: $boxShadow;
       }
 
-      &[type="color"] {
+      &[type='color'] {
         margin: 0 auto;
         padding: 0;
         width: 80%;
@@ -76,7 +76,7 @@ $mainForeground: rgb(218, 218, 218);
       &:first-of-type {
         padding-top: 10px;
       }
-      input[type="checkbox"] {
+      input[type='checkbox'] {
         margin-left: 20px;
       }
       label {
@@ -126,7 +126,7 @@ $mainForeground: rgb(218, 218, 218);
       transform: scale(1.1);
     }
   }
-  input[type="range"] {
+  input[type='range'] {
     -webkit-appearance: none;
     outline: none;
     cursor: pointer;
@@ -171,7 +171,7 @@ $mainForeground: rgb(218, 218, 218);
     align-items: center;
     position: fixed;
     bottom: 0;
-    input[type="file"] + label {
+    input[type='file'] + label {
       display: none;
     }
     h2,
@@ -185,12 +185,12 @@ $mainForeground: rgb(218, 218, 218);
       flex-direction: column;
       justify-content: flex-start;
       align-items: center;
-      input[type="checkbox"] {
+      input[type='checkbox'] {
         visibility: hidden;
       }
-      input[type="checkbox"] + label:before {
+      input[type='checkbox'] + label:before {
         border: 1px solid rgb(122, 122, 122);
-        content: "\00a0";
+        content: '\00a0';
         position: absolute;
         top: 28px;
         display: inline-block;
@@ -198,13 +198,13 @@ $mainForeground: rgb(218, 218, 218);
         height: 32px;
         width: 32px;
       }
-      input[type="checkbox"] + label {
+      input[type='checkbox'] + label {
         text-align: center;
       }
-      input[type="checkbox"]:checked + label:before {
+      input[type='checkbox']:checked + label:before {
         background: rgb(36, 36, 36);
         color: rgb(255, 255, 255);
-        content: "-";
+        content: '-';
       }
     }
     input {
@@ -212,7 +212,7 @@ $mainForeground: rgb(218, 218, 218);
       outline: none;
       margin-bottom: 10px;
       margin: 0 auto;
-      &[type="text"] {
+      &[type='text'] {
         min-width: 200px;
         background: transparent;
         border: none;
@@ -222,11 +222,11 @@ $mainForeground: rgb(218, 218, 218);
 
         padding: 5px;
       }
-      &[type="range"] {
+      &[type='range'] {
         background-color: $mainBackground;
         height: 100%;
       }
-      &[type="color"] {
+      &[type='color'] {
         margin: 0 auto;
         padding: 0;
         min-width: 150px;
@@ -235,7 +235,7 @@ $mainForeground: rgb(218, 218, 218);
         background: none;
         border: none;
       }
-      &[type="file"] {
+      &[type='file'] {
         width: 0;
         overflow: hidden;
         background: none;
@@ -276,7 +276,7 @@ $mainForeground: rgb(218, 218, 218);
   .handle {
     display: none !important;
   }
-  input[type="range"] {
+  input[type='range'] {
     &::-webkit-slider-runnable-track {
       cursor: pointer;
       background: rgba(134, 134, 134, 0.1);

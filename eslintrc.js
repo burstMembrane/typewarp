@@ -1,1 +1,0 @@
-'object-curly-newline': 'off',

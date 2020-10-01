@@ -1,46 +1,47 @@
-const currentTask = process.env.npm_lifecycle_event;
-const path = require("path");
-const {CleanWebpackPlugin} = require("clean-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const fse = require("fs-extra");
+const currentTask = process.env.npm_lifecycle_event
+const path = require('path')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const fse = require('fs-extra')
 
 // make a new HtmlWebpack plugin for each file in the app folder
 let pages = fse
-  .readdirSync("./app")
+  .readdirSync('./app')
   .filter((file) => {
-    return file.endsWith(".html");
+    return file.endsWith('.html')
   })
   .map(
     (page) =>
       new HtmlWebpackPlugin({
         filename: page,
-        template: `./app/${page}`,
+        template: `./app/${page}`
       })
-  );
+  )
 
 // copy images to dist folder after build
-class RunAfterCompile {
-  apply(compiler) {
-    compiler.hooks.done.tap("Copy Images", () => {
-      fse.copySync("./app/assets/images", "./dist/assets/images");
-    });
-  }
-}
+// class RunAfterCompile {
+//   apply(compiler) {
+//     compiler.hooks.done.tap('Copy Images', () => {
+//       fse.copySync('./app/assets/images', './dist/assets/images')
+//     })
+//   }
+// }
 
 let cssConfig = {
   test: /\.css$/i,
   use: [
     {
-      loader: "css-loader",
+      loader: 'css-loader'
     },
-    "postcss-loader",
-  ],
-};
+    'postcss-loader'
+  ]
+}
 // shared config between build and dev tasks
 let config = {
+  devtool: 'inline-source-map',
   // set entry point (index) for webpack
-  entry: "./app/assets/scripts/App.js",
+  entry: './app/assets/scripts/App.js',
   plugins: pages,
   // set output to custom path
   module: {
@@ -48,67 +49,67 @@ let config = {
       cssConfig,
       {
         test: /\.(png|svg|jpg|gif)$/,
-        use: ["file-loader"],
+        use: ['file-loader']
       },
       {
         test: /\.(ttf|otf)$/,
-        use: ["file-loader?name=fonts/[name].[ext]"],
-      },
-    ],
-  },
-};
-
-if (currentTask == "dev") {
-  config.output = {
-    filename: "bundled.js",
-    path: path.resolve(__dirname, "app"),
-  };
-  config.devServer = {
-    before: (app, server) => {
-      server._watch(path.join(__dirname, "./app/**/*.html"));
-    },
-    host: "0.0.0.0",
-    contentBase: path.join(__dirname, "app"),
-    hot: true,
-    port: 3000,
-    stats: "errors-only",
-  };
-  // set to development
-  config.mode = "development";
-  cssConfig.use.unshift("style-loader");
+        use: ['file-loader?name=fonts/[name].[ext]']
+      }
+    ]
+  }
 }
 
-if (currentTask == "build") {
+if (currentTask == 'dev') {
+  config.output = {
+    filename: 'bundled.js',
+    path: path.resolve(__dirname, 'app')
+  }
+  config.devServer = {
+    before: (app, server) => {
+      server._watch(path.join(__dirname, './app/**/*.html'))
+    },
+    host: '0.0.0.0',
+    contentBase: path.join(__dirname, 'app'),
+    hot: true,
+    port: 3000,
+    stats: 'errors-only'
+  }
+  // set to development
+  config.mode = 'development'
+  cssConfig.use.unshift('style-loader')
+}
+
+if (currentTask == 'build') {
   config.module.rules.push({
     test: /\.js$/,
     exclude: /(node_modules)/,
     use: {
-      loader: "babel-loader",
+      loader: 'babel-loader',
       options: {
-        presets: ["@babel/preset-env"],
-      },
-    },
-  });
+        presets: ['@babel/preset-env']
+      }
+    }
+  })
   config.output = {
-    filename: "[name].[chunkhash].js",
-    chunkFilename: "[name].[chunkhash].js",
-    path: path.resolve(__dirname, "dist"),
-  };
-  config.mode = "production";
+    filename: '[name].[chunkhash].js',
+    chunkFilename: '[name].[chunkhash].js',
+    path: path.resolve(__dirname, 'dist')
+  }
+  config.mode = 'production'
   config.optimization = {
     splitChunks: {
-      chunks: "all",
-    },
-  };
+      chunks: 'all'
+    }
+  }
   config.plugins = [
     ...config.plugins,
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: "styles.[chunkhash].css",
-    }),
+      filename: 'styles.[chunkhash].css'
+    })
     //new RunAfterCompile(),
-  ];
-  cssConfig.use.unshift(MiniCssExtractPlugin.loader);
+  ]
+  cssConfig.use.unshift(MiniCssExtractPlugin.loader)
 }
 
-module.exports = config;
+module.exports = config
