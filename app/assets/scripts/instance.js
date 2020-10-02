@@ -422,8 +422,10 @@ export default (sketch) => {
 
   sketch.setup = () => {
     sketch.createCanvas(w, h)
-    textX = sketch.width / 2
-    textY = sketch.height / 2
+    w = sketch.width
+    h = sketch.height
+    textX = w / 2
+    textY = h / 2
     textSetup()
     updateValues()
     savePreset()
