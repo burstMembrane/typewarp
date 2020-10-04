@@ -63,6 +63,7 @@ export default (sketch) => {
     textBoundary,
     dragging,
     textArray,
+    rawArray,
     errText,
     fontBasename,
     presets
@@ -146,17 +147,29 @@ export default (sketch) => {
     textY += textBoundary.h / 2
     // reinit textboundary after centering text
     textBoundary = font.textBounds(innerText, textX, textY, fontSize)
-    textArray = font.textToPoints(innerText, textX, textY, fontSize, {
+    rawArray = font.textToPoints(innerText, textX, textY, fontSize, {
       sampleFactor: sampleFactorSlider.value(),
       simplifyThreshold: 0
+    })
+    textArray = rawArray.map((vec) => {
+      return {
+        x: Math.floor(vec.x),
+        y: Math.floor(vec.y)
+      }
     })
   }
 
   const changeText = () => {
     textBoundary = font.textBounds(innerText, textX, textY, fontSize)
-    textArray = font.textToPoints(innerText, textX, textY, fontSize, {
+    rawArray = font.textToPoints(innerText, textX, textY, fontSize, {
       sampleFactor: sampleFactorSlider.value(),
       simplifyThreshold: 0
+    })
+    textArray = rawArray.map((vec) => {
+      return {
+        x: Math.floor(vec.x),
+        y: Math.floor(vec.y)
+      }
     })
   }
 
@@ -319,23 +332,22 @@ export default (sketch) => {
   }
   // MAKE ANIMATION FROM VERTICES
   const makeVertexAnimation = () => {
-    textArray.map(function (val) {
-      sketch.push()
-      val.x = Math.floor(val.x)
-      val.y = Math.floor(val.y)
+    sketch.push()
+    sketch.stroke(lineColor)
+    sketch.strokeWeight(strokeWeight)
+    textArray.forEach((val) => {
+      // val.x = Math.floor(val.x)
+      // val.y = Math.floor(val.y)
       sinX = Math.sin(posX)
       sinY = Math.sin(posY)
-      sketch.stroke(lineColor)
-      sketch.strokeCap(sketch.ROUND)
-      sketch.strokeWeight(strokeWeight)
       xAnim = (xInit + val.x + sinX * sinXRatio) * spacing
       yAnim = (yInit + val.y + sinY * sinYRatio) * spacing
       sketch.beginShape()
       sketch.vertex(val.x, val.y)
-      sketch.vertex(xAnim, yAnim)
+      sketch.vertex(xAnim.toFixed(2), yAnim.toFixed(2))
       sketch.endShape()
-      sketch.pop()
     })
+    sketch.pop()
   }
 
   // SHOW/HIDE VISUAL ELEMENTS
@@ -403,6 +415,11 @@ export default (sketch) => {
     spacing = spacingSlider.value()
     fillColor = textColorPicker.color()
   }
+  const timeFunction = (func) => {
+    console.time(`${func.name}`)
+    func()
+    console.timeEnd(`${func.name}`)
+  }
 
   const runRainbowMode = () => {
     let hue = (sketch.millis() / 100) % 100
@@ -432,12 +449,12 @@ export default (sketch) => {
   sketch.draw = () => {
     updateValues()
     sketch.background(bgColor)
-    showFps ? showFPS() : null
-    showBoundary || dragging ? showBoundingBox() : null
-    !rainbowMode ? sketch.stroke(lineColor) : runRainbowMode()
-    makeVertexAnimation()
-    fillText && textArray ? showFillText() : null
-    showCrosshair ? drawCrossHair() : null
+    showFps && showFPS()
+    showBoundary || (dragging && showBoundingBox())
+    rainbowMode && runRainbowMode()
+    timeFunction(makeVertexAnimation)
+    fillText && textArray && showFillText()
+    showCrosshair && drawCrossHair()
     errText && showError(errText)
   }
 }
