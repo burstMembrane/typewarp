@@ -450,7 +450,7 @@ export default (sketch) => {
     updateValues()
     sketch.background(bgColor)
     showFps && showFPS()
-    showBoundary || (dragging && showBoundingBox())
+    showBoundary || dragging ? showBoundingBox() : null
     rainbowMode && runRainbowMode()
     makeVertexAnimation()
     fillText && textArray && showFillText()
