@@ -70,7 +70,7 @@ export default (sketch) => {
   } = config
 
   // EVENT LISTENERS
-
+  let ctx
   sketch.mouseDragged = (e) => {
     const { mouseX, mouseY } = sketch
     if (e.srcElement.className === 'p5Canvas') {
@@ -78,7 +78,7 @@ export default (sketch) => {
         dragging = true
         textX = mouseX
         textY = mouseY
-        setTimeout(textSetup(), 50)
+        setTimeout(textSetup(), 20)
       }
     }
   }
@@ -350,6 +350,22 @@ export default (sketch) => {
     sketch.pop()
   }
 
+  const makeAnimationNative = () => {
+    ctx.lineWidth = strokeWeight
+    ctx.strokeStyle = lineColor
+    textArray.forEach((val) => {
+      sinX = Math.sin(posX)
+      sinY = Math.sin(posY)
+      xAnim = (xInit + val.x + sinX * sinXRatio) * spacing
+      yAnim = (yInit + val.y + sinY * sinYRatio) * spacing
+      ctx.beginPath()
+      ctx.moveTo(val.x, val.y)
+      ctx.lineTo(xAnim, yAnim)
+      ctx.stroke()
+    })
+    // sketch.pop()
+  }
+
   // SHOW/HIDE VISUAL ELEMENTS
   const showFPS = () => {
     sketch.push()
@@ -367,6 +383,7 @@ export default (sketch) => {
     sketch.push()
     sketch.noFill()
     sketch.stroke(255)
+    sketch.strokeWeight(1)
     sketch.translate(textBoundary.x, textBoundary.y)
     sketch.rect(0, 0, textBoundary.w, textBoundary.h)
     sketch.ellipse(0 + textBoundary.w / 2, 0 + textBoundary.h / 2, 10, 10)
@@ -394,10 +411,14 @@ export default (sketch) => {
     sketch.drawingContext.fillStyle = fillColor
     sketch.drawingContext.font = `${fontSize}px ${fontBasename} `
     sketch.fill(fillColor)
-    sketch.text(innerText, textX, textY)
+    sketch.text(innerText, Math.floor(textX), Math.floor(textY))
     sketch.pop()
   }
-
+  const fillTextCanvas = () => {
+    ctx.fillStyle = fillColor
+    ctx.font = `800 ${fontSize}px ${fontBasename || 'font'} `
+    ctx.fillText(innerText, textX, textY)
+  }
   // DRAW FUNCTIONS
   const updateValues = () => {
     strokeWeight = strokeWeightSlider.value()
@@ -438,6 +459,7 @@ export default (sketch) => {
 
   sketch.setup = () => {
     sketch.createCanvas(w, h)
+    ctx = sketch.drawingContext
     w = sketch.width
     h = sketch.height
     centerText()
@@ -452,7 +474,9 @@ export default (sketch) => {
     showFps && showFPS()
     showBoundary || dragging ? showBoundingBox() : null
     rainbowMode && runRainbowMode()
-    makeVertexAnimation()
+
+    makeAnimationNative()
+
     fillText && textArray && showFillText()
     showCrosshair && drawCrossHair()
     errText && showError(errText)
