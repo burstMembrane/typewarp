@@ -452,7 +452,7 @@ export default (sketch) => {
     showFps && showFPS()
     showBoundary || (dragging && showBoundingBox())
     rainbowMode && runRainbowMode()
-    timeFunction(makeVertexAnimation)
+    makeVertexAnimation()
     fillText && textArray && showFillText()
     showCrosshair && drawCrossHair()
     errText && showError(errText)
