@@ -105,10 +105,7 @@ export default (sketch) => {
       const p5Font = new Font(sketch)
       p5Font.font = newFont
       font = p5Font
-      w = sketch.width
-      h = sketch.height
-      textX = w / 2
-      textY = h / 2
+      centerText()
       changeText()
     } catch (error) {
       errText = 'Unsupported Font!'
@@ -281,8 +278,7 @@ export default (sketch) => {
     saveButton.parent(controlPanel)
     centerButton = sketch.createButton('center text')
     centerButton.mousePressed(() => {
-      textX = sketch.width / 2
-      textY = sketch.height / 2
+      centerText()
       textSetup()
     })
     centerButton.parent(controlPanel)
@@ -317,7 +313,10 @@ export default (sketch) => {
     !isMobile ? labels.push({ label: 'Upload OpenType Font ', element: fontInput }) : null
     updateLabels(labels)
   }
-
+  const centerText = () => {
+    textX = sketch.width / 2
+    textY = sketch.height / 2
+  }
   // MAKE ANIMATION FROM VERTICES
   const makeVertexAnimation = () => {
     textArray.map(function (val) {
@@ -424,8 +423,7 @@ export default (sketch) => {
     sketch.createCanvas(w, h)
     w = sketch.width
     h = sketch.height
-    textX = w / 2
-    textY = h / 2
+    centerText()
     textSetup()
     updateValues()
     savePreset()
