@@ -436,6 +436,7 @@ export default (sketch) => {
     spacing = spacingSlider.value()
     fillColor = textColorPicker.color()
   }
+
   const timeFunction = (func) => {
     console.time(`${func.name}`)
     func()
