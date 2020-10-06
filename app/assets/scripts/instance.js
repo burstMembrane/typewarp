@@ -331,24 +331,24 @@ export default (sketch) => {
     textY = sketch.height / 2
   }
   // MAKE ANIMATION FROM VERTICES
-  const makeVertexAnimation = () => {
-    sketch.push()
-    sketch.stroke(lineColor)
-    sketch.strokeWeight(strokeWeight)
-    textArray.forEach((val) => {
-      // val.x = Math.floor(val.x)
-      // val.y = Math.floor(val.y)
-      sinX = Math.sin(posX)
-      sinY = Math.sin(posY)
-      xAnim = (xInit + val.x + sinX * sinXRatio) * spacing
-      yAnim = (yInit + val.y + sinY * sinYRatio) * spacing
-      sketch.beginShape()
-      sketch.vertex(val.x, val.y)
-      sketch.vertex(xAnim.toFixed(2), yAnim.toFixed(2))
-      sketch.endShape()
-    })
-    sketch.pop()
-  }
+  // const makeVertexAnimation = () => {
+  //   sketch.push()
+  //   sketch.stroke(lineColor)
+  //   sketch.strokeWeight(strokeWeight)
+  //   textArray.forEach((val) => {
+  //     // val.x = Math.floor(val.x)
+  //     // val.y = Math.floor(val.y)
+  //     sinX = Math.sin(posX)
+  //     sinY = Math.sin(posY)
+  //     xAnim = (xInit + val.x + sinX * sinXRatio) * spacing
+  //     yAnim = (yInit + val.y + sinY * sinYRatio) * spacing
+  //     sketch.beginShape()
+  //     sketch.vertex(val.x, val.y)
+  //     sketch.vertex(xAnim.toFixed(2), yAnim.toFixed(2))
+  //     sketch.endShape()
+  //   })
+  //   sketch.pop()
+  // }
 
   const makeAnimationNative = () => {
     ctx.lineWidth = strokeWeight
@@ -414,11 +414,11 @@ export default (sketch) => {
     sketch.text(innerText, Math.floor(textX), Math.floor(textY))
     sketch.pop()
   }
-  const fillTextCanvas = () => {
-    ctx.fillStyle = fillColor
-    ctx.font = `800 ${fontSize}px ${fontBasename || 'font'} `
-    ctx.fillText(innerText, textX, textY)
-  }
+  // const fillTextCanvas = () => {
+  //   ctx.fillStyle = fillColor
+  //   ctx.font = `800 ${fontSize}px ${fontBasename || 'font'} `
+  //   ctx.fillText(innerText, textX, textY)
+  // }
   // DRAW FUNCTIONS
   const updateValues = () => {
     strokeWeight = strokeWeightSlider.value()
@@ -437,11 +437,11 @@ export default (sketch) => {
     fillColor = textColorPicker.color()
   }
 
-  const timeFunction = (func) => {
-    console.time(`${func.name}`)
-    func()
-    console.timeEnd(`${func.name}`)
-  }
+  // const timeFunction = (func) => {
+  //   console.time(`${func.name}`)
+  //   func()
+  //   console.timeEnd(`${func.name}`)
+  // }
 
   const runRainbowMode = () => {
     let hue = (sketch.millis() / 100) % 100
